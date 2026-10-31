@@ -1,0 +1,5 @@
+RU
+Предупреждения о низкой прочности инструментов, брони и других предметов: панель на экране, звук и настраиваемые пороги.
+
+EN
+Low-durability alerts for tools, armor and other items, with an on-screen panel, sound and configurable thresholds.

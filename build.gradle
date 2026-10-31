@@ -1,0 +1,45 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.17.21'
+}
+
+group = project.maven_group
+version = "${project.mod_version}+mc${project.minecraft_version}"
+base { archivesName = project.archives_base_name }
+
+repositories { mavenCentral() }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand(version: project.version) }
+}
+
+jar {
+    from('LICENSE')
+    manifest.attributes('Fabric-Mapping-Namespace': 'official')
+}
+
+// These checks exercise the alarm state machine without starting Minecraft.
+// The standalone runner below is used instead of a JUnit test engine.
+tasks.named('test') { enabled = false }
+tasks.register('logicTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.zadko.durabilityalarm.core.AlarmLogicTest'
+}
+check.dependsOn logicTest
