@@ -41,7 +41,7 @@ public final class DurabilityAlarmClient implements ClientModInitializer {
         KeyMapping.Category category = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath("durability_alarm", "settings"));
         settingsKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.durability_alarm.settings", InputConstants.Type.KEYBOARD, InputConstants.KEY_K, category));
+                "key.durability_alarm.settings", InputConstants.Type.KEYSYM, InputConstants.KEY_K, category));
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT,
                 Identifier.fromNamespaceAndPath("durability_alarm", "warnings"), hud::extract);
