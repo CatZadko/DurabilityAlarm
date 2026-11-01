@@ -107,7 +107,7 @@ public final class AlarmSettingsScreen extends Screen {
     public void onClose() {
         boolean saved = config.save();
         mod.resetTracking();
-        minecraft.gui.setScreen(null);
+        minecraft.setScreen(null);
         if (!saved && minecraft.player != null) {
             minecraft.player.sendSystemMessage(tr("save_error"));
         }

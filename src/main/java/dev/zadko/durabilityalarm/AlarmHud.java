@@ -18,7 +18,7 @@ public final class AlarmHud {
 
     public void extract(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || client.gui.hud.isHidden() || client.gui.screen() != null) return;
+        if (client.player == null || client.options.hideGui || client.screen != null) return;
         List<WatchedItem> items = mod.visibleWarnings();
         if (items.isEmpty() || (!mod.config().enabled && !mod.isDemo())) return;
         Font font = client.font;
