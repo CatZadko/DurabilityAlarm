@@ -4,7 +4,7 @@
 
 A client-side Fabric mod that warns you when your items are running low on durability.
 
-**Minecraft 26.3 · Fabric · Version 1.0.3 · Author: Zadko · MIT**
+**Minecraft 1.21.5 · Fabric · Version 1.0.5 · Author: Zadko · MIT**
 
 [Русская документация](README_RU.md) · [Changelog](CHANGELOG.md) · [License](LICENSE)
 
@@ -26,24 +26,24 @@ The mod reports remaining durability. It does not predict an exact time until an
 
 | Component | Required version |
 | --- | --- |
-| Minecraft Java Edition | 26.3 |
+| Minecraft Java Edition | 1.21.5 |
 | Fabric Loader | 0.19.5 or later |
-| Fabric API | 0.161.0+26.3 or later for Minecraft 26.3 |
-| Java | 25 or later; building uses JDK 25 |
+| Fabric API | 0.128.2+1.21.5 or later for Minecraft 1.21.5 |
+| Java | 21 or later; build with JDK 21 or JDK 25, targeting Java 21 |
 
 Install the mod on the **client**. Server installation is not required.
 
 ## Install
 
-1. Set up Minecraft 26.3 with Fabric Loader and Fabric API.
-2. Place the compiled `durability-alarm-1.0.3+mc26.3.jar` in the instance's `mods` directory.
+1. Set up Minecraft 1.21.5 with Fabric Loader and Fabric API.
+2. Place the compiled `durability-alarm-1.0.5+mc1.21.5.jar` in the instance's `mods` directory.
 3. Start the game and press **K** in a world to configure the mod or preview a warning.
 
 This repository contains source code. The `-sources.jar` artifact is not an installable mod.
 
 ## Build from source
 
-Install **JDK 25**. The included Gradle Wrapper downloads the required Gradle version and dependencies on first use.
+Install **JDK 21 or 25**. The included Gradle Wrapper downloads the required Gradle version and dependencies on first use.
 
 Linux / macOS:
 
@@ -58,9 +58,11 @@ Windows PowerShell:
 .\gradlew.bat build
 ```
 
-Output: `build/libs/durability-alarm-1.0.3+mc26.3.jar`.
+Output: `build/libs/durability-alarm-1.0.5+mc1.21.5.jar`.
 
 `./gradlew logicTest` runs the standalone alarm-logic checks. The `build` task includes these checks as well.
+
+The source port does not include a compiled mod JAR. Gradle build and in-game testing have not been run.
 
 ## Configuration and scope
 
@@ -73,13 +75,10 @@ Output: `build/libs/durability-alarm-1.0.3+mc26.3.jar`.
 ## Project files
 
 - [Russian guide](README_RU.md)
-- [Modrinth description in English](MODRINTH_EN.md)
-- [Modrinth description in Russian](MODRINTH_RU.md)
-- [Short Modrinth summaries](MODRINTH_SUMMARIES.txt)
-- [GitHub upload guide in Russian](GITHUB_UPLOAD_RU.md)
+- [Porting notes](PORTING.md)
 
 ## License and credits
 
 Mod source code: [MIT License](LICENSE), copyright 2026 **Zadko**.
 
-The Gradle Wrapper is distributed under [Apache License 2.0](LICENSE-Gradle.txt). Icon credits are listed in [ASSET_CREDITS.md](ASSET_CREDITS.md).
+The Gradle Wrapper is distributed under [Apache License 2.0](LICENSE-Gradle.txt). The icon is preserved unchanged from the supplied source archive.

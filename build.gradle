@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.17.21'
+    id 'net.fabricmc.fabric-loom-remap' version '1.17.21'
 }
 
 group = project.maven_group
@@ -10,28 +10,37 @@ repositories { mavenCentral() }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    // Use the JDK running Gradle (21 or newer), targeting the Java 21 game runtime.
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 25
+    options.release = 21
 }
 
+def resourceProperties = [
+    version: project.version,
+    minecraft_version: project.minecraft_version,
+    loader_version: project.loader_version,
+    fabric_api_version: project.fabric_api_version
+]
+
 processResources {
-    inputs.property 'version', project.version
-    filesMatching('fabric.mod.json') { expand(version: project.version) }
+    inputs.properties(resourceProperties)
+    filesMatching('fabric.mod.json') { expand(resourceProperties) }
 }
 
 jar {
     from('LICENSE')
-    manifest.attributes('Fabric-Mapping-Namespace': 'official')
 }
 
 // These checks exercise the alarm state machine without starting Minecraft.
