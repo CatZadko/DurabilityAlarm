@@ -6,7 +6,7 @@ import dev.zadko.durabilityalarm.core.DurabilityRules;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.ChatFormatting;
@@ -16,7 +16,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,19 +38,18 @@ public final class DurabilityAlarmClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         config = AlarmConfig.load();
-        KeyMapping.Category category = KeyMapping.Category.register(
-                Identifier.fromNamespaceAndPath("durability_alarm", "settings"));
-        settingsKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.durability_alarm.settings", InputConstants.Type.KEYBOARD, InputConstants.KEY_K, category));
+        String category = "key.category.durability_alarm.settings";
+        settingsKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.durability_alarm.settings", InputConstants.Type.KEYSYM, InputConstants.KEY_K, category));
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT,
-                Identifier.fromNamespaceAndPath("durability_alarm", "warnings"), hud::extract);
+                ResourceLocation.fromNamespaceAndPath("durability_alarm", "warnings"), hud::render);
     }
 
     private void tick(Minecraft client) {
         while (settingsKey.consumeClick()) {
-            if (client.player != null && client.gui.screen() == null) {
-                client.gui.setScreen(new AlarmSettingsScreen(this));
+            if (client.player != null && client.screen == null) {
+                client.setScreen(new AlarmSettingsScreen(this));
             }
         }
         if (client.player != trackedPlayer) {
@@ -66,7 +65,7 @@ public final class DurabilityAlarmClient implements ClientModInitializer {
             if (!warnings.isEmpty()) resetTracking();
             return;
         }
-        // 43 inventory/equipment slots at most, four scans per second, never per frame.
+        // At most 36 main slots, 5 equipment slots and the cursor, four scans per second.
         if (tick % 5 != 0) return;
         warnings = InventoryScanner.scan(client.player, config);
         List<AlertTracker.Observation> observations = warnings.stream().map(item ->
@@ -81,7 +80,7 @@ public final class DurabilityAlarmClient implements ClientModInitializer {
         bannerUntil = tick + 100;
         playAlert(client, severity);
         if (config.chat && client.player != null) {
-            client.player.sendSystemMessage(Component.literal("[Durability Alarm] ")
+            client.gui.getChat().addMessage(Component.literal("[Durability Alarm] ")
                     .append(banner.copy()).withStyle(severity >= 2 ? ChatFormatting.RED : ChatFormatting.GOLD));
         }
     }

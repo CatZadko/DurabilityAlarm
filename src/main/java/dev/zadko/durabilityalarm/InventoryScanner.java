@@ -18,38 +18,45 @@ import net.minecraft.world.item.ItemStack;
 public final class InventoryScanner {
     private record Identity(Item item, Map<DataComponentType<?>, Object> components) {}
 
+    private static final int MAIN_INVENTORY_SIZE = 36;
+    private static final int HOTBAR_SIZE = 9;
+    private static final List<EquipmentSlot> EQUIPMENT = List.of(
+            EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
+            EquipmentSlot.FEET, EquipmentSlot.OFFHAND);
+
     private InventoryScanner() {}
 
     public static List<WatchedItem> scan(LocalPlayer player, AlarmConfig config) {
         List<WatchedItem> result = new ArrayList<>();
         Inventory inventory = player.getInventory();
         if (config.allInventory) {
-            for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-                add(result, inventory.getItem(slot), location(inventory, slot), config);
+            // Scan only the 36 main slots here; equipment storage changed across 1.21.x.
+            for (int slot = 0; slot < MAIN_INVENTORY_SIZE; slot++) {
+                add(result, inventory.getItem(slot), location(player, slot), config);
             }
-            // A tool being dragged in an inventory GUI remains monitored.
             add(result, player.containerMenu.getCarried(),
                     Component.translatable("durability_alarm.slot.cursor"), config);
         } else {
-            add(result, inventory.getSelectedItem(),
+            add(result, player.getMainHandItem(),
                     Component.translatable("durability_alarm.slot.mainhand"), config);
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (slot == EquipmentSlot.MAINHAND) continue;
-                add(result, player.getItemBySlot(slot),
-                        Component.translatable("durability_alarm.slot." + slot.getName()), config);
-            }
+        }
+        // Query player equipment explicitly, once in either scan mode.
+        for (EquipmentSlot slot : EQUIPMENT) {
+            add(result, player.getItemBySlot(slot),
+                    Component.translatable("durability_alarm.slot." + slot.getName()), config);
         }
         result.sort(Comparator.comparingInt(WatchedItem::severity).reversed()
                 .thenComparingDouble(WatchedItem::percent).thenComparingInt(WatchedItem::remaining));
         return List.copyOf(result);
     }
 
-    private static Component location(Inventory inventory, int index) {
-        if (index == inventory.getSelectedSlot()) return Component.translatable("durability_alarm.slot.mainhand");
-        if (index < Inventory.getSelectionSize()) return Component.translatable("durability_alarm.slot.hotbar", index + 1);
-        if (index < Inventory.INVENTORY_SIZE) return Component.translatable("durability_alarm.slot.inventory", index + 1);
-        EquipmentSlot slot = Inventory.EQUIPMENT_SLOT_MAPPING.get(index);
-        return Component.translatable("durability_alarm.slot." + (slot == null ? "equipment" : slot.getName()));
+    private static Component location(LocalPlayer player, int index) {
+        // Both accessors return the live stack; no version-specific selected-slot API is needed.
+        if (index < HOTBAR_SIZE && player.getInventory().getItem(index) == player.getMainHandItem()) {
+            return Component.translatable("durability_alarm.slot.mainhand");
+        }
+        if (index < HOTBAR_SIZE) return Component.translatable("durability_alarm.slot.hotbar", index + 1);
+        return Component.translatable("durability_alarm.slot.inventory", index + 1);
     }
 
     private static void add(List<WatchedItem> result, ItemStack stack, Component location, AlarmConfig config) {
