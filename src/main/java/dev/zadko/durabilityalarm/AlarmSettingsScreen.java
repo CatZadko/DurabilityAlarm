@@ -2,7 +2,7 @@ package dev.zadko.durabilityalarm;
 
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -94,22 +94,21 @@ public final class AlarmSettingsScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        // Screen.extractRenderStateWithTooltipAndSubtitles already extracts the background.
-        // Calling it again here applies blur twice and crashes with "Can only blur once per frame".
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        // Let the standard Screen pipeline handle the background and blur once.
+        super.render(graphics, mouseX, mouseY, partialTick);
         int top = Math.max(36, (height - 184) / 2);
-        graphics.centeredText(font, title, width / 2, top - 27, 0xFFFFC566);
-        graphics.centeredText(font, tr("subtitle"), width / 2, top - 13, 0xFFAAB6C9);
+        graphics.drawCenteredString(font, title, width / 2, top - 27, 0xFFFFC566);
+        graphics.drawCenteredString(font, tr("subtitle"), width / 2, top - 13, 0xFFAAB6C9);
     }
 
     @Override
     public void onClose() {
         boolean saved = config.save();
         mod.resetTracking();
-        minecraft.gui.setScreen(null);
+        minecraft.setScreen(null);
         if (!saved && minecraft.player != null) {
-            minecraft.player.sendSystemMessage(tr("save_error"));
+            minecraft.gui.getChat().addMessage(tr("save_error"));
         }
     }
 
