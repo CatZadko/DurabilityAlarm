@@ -5,7 +5,7 @@ import java.util.Locale;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public final class AlarmHud {
@@ -16,9 +16,9 @@ public final class AlarmHud {
 
     public AlarmHud(DurabilityAlarmClient mod) { this.mod = mod; }
 
-    public void extract(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || client.gui.hud.isHidden() || client.gui.screen() != null) return;
+        if (client.player == null || client.options.hideGui || client.screen != null) return;
         List<WatchedItem> items = mod.visibleWarnings();
         if (items.isEmpty() || (!mod.config().enabled && !mod.isDemo())) return;
         Font font = client.font;
@@ -37,7 +37,7 @@ public final class AlarmHud {
 
         graphics.fill(x, y, x + width, y + height, 0xDD11151E);
         graphics.fill(x, y, x + 3, y + height, accent);
-        graphics.text(font, Component.translatable(mod.isDemo() ? "durability_alarm.hud.demo"
+        graphics.drawString(font, Component.translatable(mod.isDemo() ? "durability_alarm.hud.demo"
                 : "durability_alarm.hud.title"), x + 10, y + 8, accent, false);
 
         for (int row = 0; row < visible; row++) {
@@ -48,12 +48,12 @@ public final class AlarmHud {
             WatchedItem item = items.get(index);
             int rowY = y + 24 + row * 31;
             int color = item.severity() >= 2 ? RED : AMBER;
-            graphics.item(item.icon(), x + 10, rowY + 3);
-            graphics.text(font, fit(font, item.name().getString(), width - 43), x + 33, rowY, WHITE, true);
+            graphics.renderItem(item.icon(), x + 10, rowY + 3);
+            graphics.drawString(font, fit(font, item.name().getString(), width - 43), x + 33, rowY, WHITE, true);
             String detail = item.remaining() + " / " + item.maximum() + "  ("
                     + String.format(Locale.ROOT, "%.1f", item.percent()) + "%)";
-            graphics.text(font, fit(font, detail, width - 43), x + 33, rowY + 10, color, false);
-            graphics.text(font, fit(font, item.location().getString(), width - 43),
+            graphics.drawString(font, fit(font, detail, width - 43), x + 33, rowY + 10, color, false);
+            graphics.drawString(font, fit(font, item.location().getString(), width - 43),
                     x + 33, rowY + 20, 0xFF9AA5B7, false);
             int barX = x + 10;
             int barY = rowY + 22;
@@ -65,7 +65,7 @@ public final class AlarmHud {
         Component footer = pages > 1
                 ? Component.translatable("durability_alarm.hud.pages", items.size(), page + 1, pages)
                 : Component.translatable("durability_alarm.hud.settings", mod.settingsKeyName());
-        graphics.text(font, fit(font, footer.getString(), width - 20), x + 10, y + height - 11, 0xFF9AA5B7, false);
+        graphics.drawString(font, fit(font, footer.getString(), width - 20), x + 10, y + height - 11, 0xFF9AA5B7, false);
 
         if (mod.showBanner()) {
             String text = fit(font, mod.banner().getString(), graphics.guiWidth() - 40);
@@ -75,7 +75,7 @@ public final class AlarmHud {
             int color = mod.bannerSeverity() >= 2 ? RED : AMBER;
             graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + 22, 0xE211151E);
             graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + 2, color);
-            graphics.centeredText(font, text, graphics.guiWidth() / 2, bannerY + 8, color);
+            graphics.drawCenteredString(font, text, graphics.guiWidth() / 2, bannerY + 8, color);
         }
     }
 

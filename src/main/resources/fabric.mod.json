@@ -5,16 +5,20 @@
   "name": "Durability Alarm",
   "icon": "assets/durability_alarm/icon.png",
   "description": "Low-durability HUD and sound alerts for equipment and your inventory. Press K for settings.",
-  "authors": ["Zadko"],
+  "authors": [
+    "Zadko"
+  ],
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
-    "client": ["dev.zadko.durabilityalarm.DurabilityAlarmClient"]
+    "client": [
+      "dev.zadko.durabilityalarm.DurabilityAlarmClient"
+    ]
   },
   "depends": {
-    "fabricloader": ">=0.19.5",
-    "minecraft": "~26.3",
-    "java": ">=25",
-    "fabric-api": ">=0.161.0"
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": ">=${fabric_api_version}"
   }
 }
