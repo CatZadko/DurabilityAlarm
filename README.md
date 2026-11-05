@@ -73,10 +73,6 @@ Output: `build/libs/durability-alarm-1.0.3+mc26.3.jar`.
 ## Project files
 
 - [Russian guide](README_RU.md)
-- [Modrinth description in English](MODRINTH_EN.md)
-- [Modrinth description in Russian](MODRINTH_RU.md)
-- [Short Modrinth summaries](MODRINTH_SUMMARIES.txt)
-- [GitHub upload guide in Russian](GITHUB_UPLOAD_RU.md)
 
 ## License and credits
 
